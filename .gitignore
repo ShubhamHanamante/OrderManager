@@ -1,0 +1,31 @@
+
+# .NET build files
+bin/
+obj/
+[Bb]uild/
+[Dd]ebug/
+[Rr]elease/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# macOS
+.DS_Store
+
+# SQLite database files
+*.db
+*.db-shm
+*.db-wal
+
+# Local configuration and secrets
+appsettings.Development.json
+secrets.json
+
+# Logs
+*.log
+
+# IDE
+.idea/
+.vscode/
