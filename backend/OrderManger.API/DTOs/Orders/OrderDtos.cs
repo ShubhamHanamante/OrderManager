@@ -73,3 +73,26 @@ public class OrderStatusHistoryDto
     public string ChangedBy { get; set; } = null!;
     public string ChangedAtUtc { get; set; } = null!;
 }
+
+/// <summary>
+/// Lightweight order summary for list endpoints (recent orders, orders by status).
+/// Does not include full items, payments, or status history.
+/// </summary>
+public class OrderSummaryResponseDto
+{
+    public string OrderNumber { get; set; } = null!;
+    public string OrderDateUtc { get; set; } = null!;
+    public string OrderStatus { get; set; } = null!;
+    public string Currency { get; set; } = null!;
+
+    public decimal Total { get; set; }
+    public int TotalPaise { get; set; }
+
+    public int ItemCount { get; set; }
+
+    // Latest shipment info (if any)
+    public string? Carrier { get; set; }
+    public string? TrackingNumber { get; set; }
+    public string? ShipmentStatus { get; set; }
+    public string? EstimatedDeliveryUtc { get; set; }
+}

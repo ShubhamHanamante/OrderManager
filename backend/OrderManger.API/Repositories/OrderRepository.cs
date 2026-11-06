@@ -32,4 +32,46 @@ public class OrderRepository : IOrderRepository
                        o.CustomerId == customerId)
                    .SingleOrDefaultAsync(cancellationToken);
     }
+
+    public async Task<IReadOnlyList<Order>> GetOrdersAsync(
+        int customerId,
+        string? status = null,
+        int? limit = null,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _context.Orders
+            .AsNoTracking()
+            .AsSplitQuery()
+            .Include(o => o.OrderItems)
+            .Include(o => o.Shipments)
+            .Where(o => o.CustomerId == customerId);
+
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            query = query.Where(o => o.OrderStatus.ToLower() == status.Trim().ToLower());
+        }
+
+        query = query.OrderByDescending(o => o.OrderDateUtc);
+
+        if (limit.HasValue && limit.Value > 0)
+        {
+            query = query.Take(limit.Value);
+        }
+
+        return await query.ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<OrderItem>> GetOrderItemsAsync(
+        string orderNumber,
+        int customerId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _context.OrderItems
+            .AsNoTracking()
+            .Where(oi =>
+                oi.Order.OrderNumber == orderNumber &&
+                oi.Order.CustomerId == customerId)
+            .OrderBy(oi => oi.OrderItemId)
+            .ToListAsync(cancellationToken);
+    }
 }

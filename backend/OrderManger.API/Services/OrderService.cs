@@ -28,6 +28,53 @@ public class OrderService : IOrderService
         return MapToOrderDetailResponseDto(order);
     }
 
+    public async Task<IReadOnlyList<OrderSummaryResponseDto>> GetRecentOrdersAsync(
+        int customerId,
+        int limit = 5,
+        CancellationToken cancellationToken = default)
+    {
+        var orders = await _orderRepository.GetOrdersAsync(customerId, status: null, limit: limit, cancellationToken);
+        return orders.Select(MapToOrderSummaryResponseDto).ToList();
+    }
+
+    public async Task<IReadOnlyList<OrderSummaryResponseDto>> GetOrdersByStatusAsync(
+        int customerId,
+        string status,
+        CancellationToken cancellationToken = default)
+    {
+        var orders = await _orderRepository.GetOrdersAsync(customerId, status: status, limit: null, cancellationToken);
+        return orders.Select(MapToOrderSummaryResponseDto).ToList();
+    }
+
+    public async Task<IReadOnlyList<OrderItemDto>?> GetOrderItemsAsync(
+        string orderNumber,
+        int customerId,
+        CancellationToken cancellationToken = default)
+    {
+        // Verify the order exists and belongs to the customer
+        var order = await _orderRepository.GetByOrderNumberAsync(orderNumber, customerId, cancellationToken);
+        if (order is null)
+        {
+            return null;
+        }
+
+        var items = await _orderRepository.GetOrderItemsAsync(orderNumber, customerId, cancellationToken);
+        return items.Select(item => new OrderItemDto
+        {
+            OrderItemId = item.OrderItemId,
+            ProductId = item.ProductId,
+            ProductName = item.ProductNameSnapshot,
+            Sku = item.Sku,
+            Quantity = item.Quantity,
+            UnitPrice = item.UnitPricePaise / 100.0m,
+            UnitPricePaise = item.UnitPricePaise,
+            Discount = item.DiscountPaise / 100.0m,
+            DiscountPaise = item.DiscountPaise,
+            LineTotal = item.LineTotalPaise / 100.0m,
+            LineTotalPaise = item.LineTotalPaise
+        }).ToList();
+    }
+
     private static OrderDetailResponseDto MapToOrderDetailResponseDto(Order order)
     {
         var customerName = order.Customer != null
@@ -98,6 +145,29 @@ public class OrderService : IOrderService
                     ChangedBy = history.ChangedBy,
                     ChangedAtUtc = history.ChangedAtUtc
                 }).ToList()
+        };
+    }
+
+    private static OrderSummaryResponseDto MapToOrderSummaryResponseDto(Order order)
+    {
+        // Pick the latest shipment (if any) for summary display
+        var latestShipment = order.Shipments
+            .OrderByDescending(s => s.ShippedAtUtc ?? s.CreatedAtUtc)
+            .FirstOrDefault();
+
+        return new OrderSummaryResponseDto
+        {
+            OrderNumber = order.OrderNumber,
+            OrderDateUtc = order.OrderDateUtc,
+            OrderStatus = order.OrderStatus,
+            Currency = order.Currency,
+            Total = order.TotalPaise / 100.0m,
+            TotalPaise = order.TotalPaise,
+            ItemCount = order.OrderItems.Count,
+            Carrier = latestShipment?.Carrier,
+            TrackingNumber = latestShipment?.TrackingNumber,
+            ShipmentStatus = latestShipment?.ShipmentStatus,
+            EstimatedDeliveryUtc = latestShipment?.EstimatedDeliveryUtc
         };
     }
 }
