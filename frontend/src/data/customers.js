@@ -51,3 +51,4 @@ export const SUGGESTED_PROMPTS = [
   "What was the previous status of my order?",
   "Do I have any pending orders?"
 ];
+

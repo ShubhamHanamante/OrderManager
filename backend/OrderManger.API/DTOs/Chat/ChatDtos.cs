@@ -29,3 +29,4 @@ public class ChatResponseDto
     public List<ToolExecutionRecordDto> ToolsUsed { get; set; } = [];
     public object? StructuredData { get; set; }
 }
+

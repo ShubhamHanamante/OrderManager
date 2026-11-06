@@ -162,3 +162,4 @@ export default function Header({ activeCustomer, onSelectCustomer, customers }) 
     </header>
   );
 }
+

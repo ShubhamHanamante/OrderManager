@@ -90,3 +90,4 @@ public class OllamaChatResponse
     [JsonPropertyName("done")]
     public bool Done { get; set; }
 }
+

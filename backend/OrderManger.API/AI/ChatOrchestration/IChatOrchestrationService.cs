@@ -6,3 +6,4 @@ public interface IChatOrchestrationService
 {
     Task<ChatResponseDto> ProcessChatAsync(ChatRequestDto request, CancellationToken cancellationToken = default);
 }
+

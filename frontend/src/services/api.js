@@ -39,3 +39,4 @@ export async function fetchRecentOrders(customerId, limit = 5) {
   }
   return await response.json();
 }
+

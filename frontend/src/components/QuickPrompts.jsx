@@ -68,3 +68,4 @@ export default function QuickPrompts({ prompts, onSelectPrompt, disabled }) {
     </div>
   );
 }
+

@@ -42,3 +42,4 @@ public class OllamaClient : IOllamaClient
         return result;
     }
 }
+
