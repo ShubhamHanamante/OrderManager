@@ -13,6 +13,8 @@ obj/
 
 # macOS
 .DS_Store
+.local/
+Library/
 
 # SQLite database files
 *.db

@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using OrderManager.API.Data;
+using OrderManager.API.Repositories;
+using OrderManager.API.Repositories.Interfaces;
+using OrderManager.API.Services;
+using OrderManager.API.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
-
-
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -19,6 +21,10 @@ var fullDatabasePath = Path.GetFullPath(
 builder.Services.AddDbContext<OrderManagerDbContext>(options =>
     options.UseSqlite($"Data Source={fullDatabasePath};Foreign Keys=True")
 );
+
+// Register application repositories and services
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
