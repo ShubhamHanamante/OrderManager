@@ -28,6 +28,11 @@ secrets.json
 # Logs
 *.log
 
+# Node & Frontend
+node_modules/
+dist/
+.dist
+
 # IDE
 .idea/
 .vscode/
