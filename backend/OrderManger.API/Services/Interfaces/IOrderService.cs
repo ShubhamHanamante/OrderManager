@@ -23,4 +23,19 @@ public interface IOrderService
         string orderNumber,
         int customerId,
         CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<PaymentDto>?> GetPaymentsAsync(
+        string orderNumber,
+        int customerId,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<ShipmentDto>?> GetShipmentsAsync(
+        string orderNumber,
+        int customerId,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<OrderStatusHistoryDto>?> GetStatusHistoryAsync(
+        string orderNumber,
+        int customerId,
+        CancellationToken cancellationToken = default);
 }

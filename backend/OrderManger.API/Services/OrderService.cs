@@ -75,6 +75,78 @@ public class OrderService : IOrderService
         }).ToList();
     }
 
+    public async Task<IReadOnlyList<PaymentDto>?> GetPaymentsAsync(
+        string orderNumber,
+        int customerId,
+        CancellationToken cancellationToken = default)
+    {
+        var order = await _orderRepository.GetByOrderNumberAsync(orderNumber, customerId, cancellationToken);
+        if (order is null)
+        {
+            return null;
+        }
+
+        var payments = await _orderRepository.GetPaymentsAsync(orderNumber, customerId, cancellationToken);
+        return payments.Select(p => new PaymentDto
+        {
+            PaymentId = p.PaymentId,
+            PaymentReference = p.PaymentReference,
+            PaymentMethod = p.PaymentMethod,
+            PaymentStatus = p.PaymentStatus,
+            Amount = p.AmountPaise / 100.0m,
+            AmountPaise = p.AmountPaise,
+            Currency = p.Currency,
+            PaidAtUtc = p.PaidAtUtc
+        }).ToList();
+    }
+
+    public async Task<IReadOnlyList<ShipmentDto>?> GetShipmentsAsync(
+        string orderNumber,
+        int customerId,
+        CancellationToken cancellationToken = default)
+    {
+        var order = await _orderRepository.GetByOrderNumberAsync(orderNumber, customerId, cancellationToken);
+        if (order is null)
+        {
+            return null;
+        }
+
+        var shipments = await _orderRepository.GetShipmentsAsync(orderNumber, customerId, cancellationToken);
+        return shipments.Select(s => new ShipmentDto
+        {
+            ShipmentId = s.ShipmentId,
+            Carrier = s.Carrier,
+            TrackingNumber = s.TrackingNumber,
+            ShipmentStatus = s.ShipmentStatus,
+            TrackingUrl = s.TrackingUrl,
+            ShippedAtUtc = s.ShippedAtUtc,
+            EstimatedDeliveryUtc = s.EstimatedDeliveryUtc,
+            DeliveredAtUtc = s.DeliveredAtUtc
+        }).ToList();
+    }
+
+    public async Task<IReadOnlyList<OrderStatusHistoryDto>?> GetStatusHistoryAsync(
+        string orderNumber,
+        int customerId,
+        CancellationToken cancellationToken = default)
+    {
+        var order = await _orderRepository.GetByOrderNumberAsync(orderNumber, customerId, cancellationToken);
+        if (order is null)
+        {
+            return null;
+        }
+
+        var history = await _orderRepository.GetStatusHistoryAsync(orderNumber, customerId, cancellationToken);
+        return history.Select(h => new OrderStatusHistoryDto
+        {
+            HistoryId = h.HistoryId,
+            Status = h.Status,
+            StatusDescription = h.StatusDescription,
+            ChangedBy = h.ChangedBy,
+            ChangedAtUtc = h.ChangedAtUtc
+        }).ToList();
+    }
+
     private static OrderDetailResponseDto MapToOrderDetailResponseDto(Order order)
     {
         var customerName = order.Customer != null

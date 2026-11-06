@@ -19,4 +19,19 @@ public interface IOrderRepository
         string orderNumber,
         int customerId,
         CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<Payment>> GetPaymentsAsync(
+        string orderNumber,
+        int customerId,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<Shipment>> GetShipmentsAsync(
+        string orderNumber,
+        int customerId,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<OrderStatusHistory>> GetStatusHistoryAsync(
+        string orderNumber,
+        int customerId,
+        CancellationToken cancellationToken = default);
 }

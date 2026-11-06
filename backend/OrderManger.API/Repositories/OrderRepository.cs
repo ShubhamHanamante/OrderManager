@@ -74,4 +74,46 @@ public class OrderRepository : IOrderRepository
             .OrderBy(oi => oi.OrderItemId)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<IReadOnlyList<Payment>> GetPaymentsAsync(
+        string orderNumber,
+        int customerId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _context.Payments
+            .AsNoTracking()
+            .Where(p =>
+                p.Order.OrderNumber == orderNumber &&
+                p.Order.CustomerId == customerId)
+            .OrderBy(p => p.PaymentId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<Shipment>> GetShipmentsAsync(
+        string orderNumber,
+        int customerId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _context.Shipments
+            .AsNoTracking()
+            .Where(s =>
+                s.Order.OrderNumber == orderNumber &&
+                s.Order.CustomerId == customerId)
+            .OrderBy(s => s.ShipmentId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<OrderStatusHistory>> GetStatusHistoryAsync(
+        string orderNumber,
+        int customerId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _context.OrderStatusHistories
+            .AsNoTracking()
+            .Where(h =>
+                h.Order.OrderNumber == orderNumber &&
+                h.Order.CustomerId == customerId)
+            .OrderBy(h => h.ChangedAtUtc)
+            .ToListAsync(cancellationToken);
+    }
 }

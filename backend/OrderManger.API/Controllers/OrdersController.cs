@@ -128,5 +128,98 @@ public class OrdersController : ControllerBase
 
         return Ok(items);
     }
+
+    /// <summary>
+    /// Gets payment transactions and status for an order.
+    /// </summary>
+    [HttpGet("{orderNumber}/payments")]
+    [ProducesResponseType(typeof(IReadOnlyList<PaymentDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<IReadOnlyList<PaymentDto>>> GetPayments(
+        string orderNumber,
+        [FromQuery] int customerId, // [Development-Only]: Replace with authenticated customer identity
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(orderNumber))
+        {
+            return BadRequest(new { message = "Order number cannot be empty." });
+        }
+
+        if (customerId <= 0)
+        {
+            return BadRequest(new { message = "A valid customerId query parameter is required for development testing." });
+        }
+
+        var payments = await _orderService.GetPaymentsAsync(orderNumber, customerId, cancellationToken);
+        if (payments is null)
+        {
+            return NotFound(new { message = $"Order '{orderNumber}' was not found for customer {customerId}." });
+        }
+
+        return Ok(payments);
+    }
+
+    /// <summary>
+    /// Gets shipment details and tracking info for an order.
+    /// </summary>
+    [HttpGet("{orderNumber}/shipments")]
+    [ProducesResponseType(typeof(IReadOnlyList<ShipmentDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<IReadOnlyList<ShipmentDto>>> GetShipments(
+        string orderNumber,
+        [FromQuery] int customerId, // [Development-Only]: Replace with authenticated customer identity
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(orderNumber))
+        {
+            return BadRequest(new { message = "Order number cannot be empty." });
+        }
+
+        if (customerId <= 0)
+        {
+            return BadRequest(new { message = "A valid customerId query parameter is required for development testing." });
+        }
+
+        var shipments = await _orderService.GetShipmentsAsync(orderNumber, customerId, cancellationToken);
+        if (shipments is null)
+        {
+            return NotFound(new { message = $"Order '{orderNumber}' was not found for customer {customerId}." });
+        }
+
+        return Ok(shipments);
+    }
+
+    /// <summary>
+    /// Gets complete chronological status change history for an order.
+    /// </summary>
+    [HttpGet("{orderNumber}/history")]
+    [ProducesResponseType(typeof(IReadOnlyList<OrderStatusHistoryDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<IReadOnlyList<OrderStatusHistoryDto>>> GetStatusHistory(
+        string orderNumber,
+        [FromQuery] int customerId, // [Development-Only]: Replace with authenticated customer identity
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(orderNumber))
+        {
+            return BadRequest(new { message = "Order number cannot be empty." });
+        }
+
+        if (customerId <= 0)
+        {
+            return BadRequest(new { message = "A valid customerId query parameter is required for development testing." });
+        }
+
+        var history = await _orderService.GetStatusHistoryAsync(orderNumber, customerId, cancellationToken);
+        if (history is null)
+        {
+            return NotFound(new { message = $"Order '{orderNumber}' was not found for customer {customerId}." });
+        }
+
+        return Ok(history);
+    }
 }
 
